@@ -1,4 +1,6 @@
 {
     "server": "https://api.openweathermap.org/data/3.0/",
-    "apiKey": "7efc6ce8aefaa0da3d243949031cabfb"
+    "apiKey": "7efc6ce8aefaa0da3d243949031cabfb",
+    "locationServer": "https://api.getgeoapi.com/v2/ip/",
+    "locationKey": "27eea2c493080606b8997b4aa53a77965d9221fa"
 }

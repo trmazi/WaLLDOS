@@ -79,11 +79,13 @@ function dateClass(date) {
 var currentWeather = null;
 
 async function getCoords() {
-  const response = await axios.get("http://www.geoplugin.net/json.gp");
+  const response = await axios.get(
+    `${WeatherAPI.locationServer}check?api_key=${WeatherAPI.locationKey}&format=json`
+  );
   const currentLocation = await response.data;
   var data = {};
-  data.lat = parseFloat(currentLocation.geoplugin_latitude);
-  data.lon = parseFloat(currentLocation.geoplugin_longitude);
+  data.lat = parseFloat(currentLocation.location.latitude);
+  data.lon = parseFloat(currentLocation.location.longitude);
   return data;
 }
 
