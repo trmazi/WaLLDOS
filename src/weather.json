@@ -1,6 +1,4 @@
 {
     "server": "https://api.openweathermap.org/data/3.0/",
-    "apiKey": "7efc6ce8aefaa0da3d243949031cabfb",
-    "lat": 40.107880,
-    "lon": -85.678207
+    "apiKey": "7efc6ce8aefaa0da3d243949031cabfb"
 }

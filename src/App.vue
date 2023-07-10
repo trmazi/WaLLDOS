@@ -35,21 +35,41 @@ function doubleDate(date) {
   return date;
 }
 
-function getWeek(fromDate) {
-  var sunday = new Date(
-      fromDate.setDate(fromDate.getDate() - fromDate.getDay())
-    ),
-    result = [new Date(sunday)];
-  while (sunday.setDate(sunday.getDate() + 1) && sunday.getDay() !== 0) {
-    result.push(new Date(sunday));
+function getBirthday() {
+  const uri = window.location.search.substring(1);
+  const params = new URLSearchParams(uri);
+  const birthday = params.get("birthday");
+
+  if (birthday) {
+    const today = new Date();
+    const birthdayDate = new Date(0);
+    birthdayDate.setUTCSeconds(parseInt(birthday));
+
+    if (
+      birthdayDate.getMonth() == today.getMonth() &&
+      birthdayDate.getDate() == today.getDate()
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getWeek() {
+  var currentDate = new Date();
+  var result = [new Date(currentDate)];
+  for (var i = 0; i < 6; i++) {
+    currentDate.setDate(currentDate.getDate() + 1);
+    result.push(new Date(currentDate));
   }
   return result;
 }
 
 function dateClass(date) {
-  if (date > data.date.getDate()) {
+  var Today = new Date();
+  if (date > Today.getDate()) {
     return "border-gray-500 text-gray-400";
-  } else if (date == data.date.getDate()) {
+  } else if (date == Today.getDate()) {
     return "border-black";
   } else {
     return "border-gray-300 text-gray-300";
@@ -58,9 +78,19 @@ function dateClass(date) {
 
 var currentWeather = null;
 
+async function getCoords() {
+  const response = await axios.get("http://www.geoplugin.net/json.gp");
+  const currentLocation = await response.data;
+  var data = {};
+  data.lat = parseFloat(currentLocation.geoplugin_latitude);
+  data.lon = parseFloat(currentLocation.geoplugin_longitude);
+  return data;
+}
+
 async function getWeather() {
+  const locData = await getCoords();
   const response = await axios.get(
-    `${WeatherAPI.server}onecall?lat=${WeatherAPI.lat}&lon=${WeatherAPI.lon}&appid=${WeatherAPI.apiKey}&exclude=current,minutely,hourly&units=imperial`
+    `${WeatherAPI.server}onecall?lat=${locData.lat}&lon=${locData.lon}&appid=${WeatherAPI.apiKey}&exclude=current,minutely,hourly&units=imperial`
   );
   currentWeather = await response.data;
 }
@@ -82,18 +112,22 @@ function weatherFromDate(date) {
       return day;
     }
   }
+  return null;
 }
 
 function getTemp(date) {
   const day = weatherFromDate(date);
+  if (!day) {
+    return null;
+  }
   var temp = 0;
   if (date == data.date.getDate()) {
     var currentHr = data.date.getHours();
-    if (currentHr < 12 && currentHr > 5) {
-      temp = Math.ceil(day.temp.day);
-    } else if (currentHr < 18) {
+    if (currentHr >= 6 && currentHr < 12) {
       temp = Math.ceil(day.temp.morn);
-    } else if (currentHr < 22) {
+    } else if (currentHr >= 12 && currentHr < 18) {
+      temp = Math.ceil(day.temp.day);
+    } else if (currentHr >= 18 && currentHr < 22) {
       temp = Math.ceil(day.temp.eve);
     } else {
       temp = Math.ceil(day.temp.night);
@@ -107,6 +141,9 @@ function getTemp(date) {
 
 function getConditions(date) {
   const day = weatherFromDate(date);
+  if (!day) {
+    return null;
+  }
 
   const conditionList = {
     // Thunderstorms
@@ -204,24 +241,32 @@ function getConditions(date) {
           <h2 class="">{{ getOrdinal(data.date.getDate()) }}</h2>
         </div>
 
-        <h2 class="ml-5 text-5xl">
-          {{
-            data.date.toLocaleDateString("en-us", {
-              month: "numeric",
-              day: "numeric",
-              year: "numeric",
-            })
-          }}
-        </h2>
-        <h2 class="ml-5 text-5xl">
-          {{
-            data.date.toLocaleString("en-US", {
-              hour: "numeric",
-              minute: "numeric",
-              hour12: true,
-            })
-          }}
-        </h2>
+        <div class="flex place-items-center place-content-between w-full">
+          <div>
+            <h2 class="ml-5 text-5xl">
+              {{
+                data.date.toLocaleDateString("en-us", {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              }}
+            </h2>
+            <h2 class="ml-5 text-5xl">
+              {{
+                data.date.toLocaleString("en-US", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                })
+              }}
+            </h2>
+          </div>
+          <div v-if="getBirthday()" class="grid justify-items-center">
+            <img class="w-50" :src="`/warn/cake.png`" />
+            <h4 class="text-2xl levelFont">Happy Birthday!</h4>
+          </div>
+        </div>
         <div class="grid grid-flow-row gap-2">
           <hr class="border-2 border-black" />
           <div class="flex w-full gap-2 overflow-hidden">
@@ -241,7 +286,7 @@ function getConditions(date) {
         <hr class="w-full border-2 border-black mb-5" />
         <div class="w-full grid grid-cols-5 gap-6">
           <div
-            v-for="day of getWeek(data.date)"
+            v-for="day of getWeek()"
             :key="day"
             :class="dateClass(day.getDate())"
             class="border-2 w-36 h-40 flex justify-center place-items-center"
