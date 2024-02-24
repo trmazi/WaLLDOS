@@ -3,6 +3,7 @@ import { reactive, onMounted } from "vue";
 import * as Mdi from "@mdi/js";
 import axios from "axios";
 import WeatherAPI from "./weather.json";
+import AirPlayAPI from "./airplay.json";
 import BaseIcon from "./components/BaseIcon.vue";
 
 const data = reactive({
@@ -219,6 +220,83 @@ function getConditions(date) {
   };
   return conditionList[day.weather.find((x) => x.id).id];
 }
+
+var nowPlaying = {
+  state: "idle",
+  title: null,
+  artist: null,
+  album: null,
+  currentTime: null,
+  maxTime: null,
+  repeat: null,
+  shuffle: null,
+  albumArt: null,
+};
+
+var albumArt;
+
+async function testAirPlay() {
+  const response = await axios.get(`${AirPlayAPI.server}`);
+  const data = await response.data;
+  if (data["status"] == "ok") {
+    await getNowPlaying();
+    return true;
+  }
+  return false;
+}
+
+async function getNowPlaying() {
+  const oldTitle = nowPlaying["title"];
+  const response = await axios.get(
+    `${AirPlayAPI.apiServer}nowPlaying?identifier=BE0B6C80-EF57-4D78-9D90-27C30AC73DDE`
+  );
+  const data = await response.data;
+  if (data["status"] == "ok") {
+    nowPlaying = data["data"];
+
+    if (nowPlaying["shuffle"] == "off") {
+      nowPlaying["shuffle"] = false;
+    }
+
+    if (nowPlaying["repeat"] == "off") {
+      nowPlaying["repeat"] = false;
+    }
+
+    if (nowPlaying["title"] != oldTitle) {
+      getArt();
+    }
+    return true;
+  }
+  return false;
+}
+
+function getArt() {
+  albumArt = `${
+    AirPlayAPI.apiServer
+  }coverArt?identifier=BE0B6C80-EF57-4D78-9D90-27C30AC73DDE&rand=${Math.random()}`;
+  var ArtElement = document.getElementById("art");
+  ArtElement.src = albumArt;
+}
+
+function formatTime(totalSeconds) {
+  var minutes = Math.floor(totalSeconds / 60);
+  var seconds = totalSeconds % 60;
+
+  seconds = seconds < 10 ? "0" + seconds : seconds;
+
+  return `${minutes}:${seconds}`;
+}
+
+function calculatePercentage(currentTime, maxTime) {
+  return ((currentTime / maxTime) * 100).toFixed(2); // Fix to two decimal places
+}
+
+function trimString(string) {
+  var length = 18;
+  var trimmedString =
+    string.length > length ? string.substring(0, length - 3) + "..." : string;
+  return trimmedString;
+}
 </script>
 
 <template>
@@ -229,12 +307,96 @@ function getConditions(date) {
       class="pl-[200px] pr-[30px] w-full h-full grid content-between justify-center"
     >
       <div class="grid grid-cols-1 gap-2 text-7xl">
-        <h4 class="levelFont">
-          {{ data.date.toLocaleString("en-us", { weekday: "long" }) }},
-        </h4>
-        <h4 class="levelFont">
-          {{ data.date.toLocaleString("en-us", { month: "long" }) }}
-        </h4>
+        <div class="flex justify-between -mb-[40px]">
+          <div>
+            <h4 class="levelFont">
+              {{ data.date.toLocaleString("en-us", { weekday: "long" }) }},
+            </h4>
+            <h4 class="levelFont">
+              {{ data.date.toLocaleString("en-us", { month: "long" }) }}
+            </h4>
+          </div>
+          <div
+            v-if="testAirPlay() && nowPlaying.state != 'idle'"
+            class="levelFont w-[450px]"
+          >
+            <div>
+              <h2 class="levelFont text-[40px] pb-2">What's Playing?</h2>
+              <h2 class="text-gray-500 text-[20px]">Living Room</h2>
+            </div>
+            <card class="pt-5 my-3 rounded-lg max-h-40 bg-red-50">
+              <div class="flex justify-start">
+                <div class="grow text-[30px] pr-3">
+                  <div class="w-full -ml-2 flex items-center">
+                    <BaseIcon
+                      v-if="nowPlaying.state == 'playing'"
+                      :path="Mdi.mdiPlay"
+                      size="40"
+                    />
+                    <BaseIcon
+                      v-if="nowPlaying.state == 'paused'"
+                      :path="Mdi.mdiPause"
+                      size="40"
+                    />
+                    <BaseIcon
+                      v-if="nowPlaying.state == 'seeking'"
+                      :path="Mdi.mdiFastForward"
+                      size="40"
+                    />
+                    <BaseIcon
+                      v-if="nowPlaying.state == 'loading'"
+                      :path="Mdi.mdiLoading"
+                      size="40"
+                    />
+                    <BaseIcon
+                      v-if="nowPlaying.state == 'stopped'"
+                      :path="Mdi.mdiStop"
+                      size="40"
+                    />
+                    <BaseIcon
+                      v-if="nowPlaying.repeat"
+                      :path="Mdi.mdiRepeat"
+                      size="20"
+                    />
+                    <BaseIcon
+                      v-if="nowPlaying.shuffle"
+                      :path="Mdi.mdiShuffle"
+                      size="20"
+                    />
+                  </div>
+                  <div class="flex justify-between text-xl">
+                    <p>{{ formatTime(nowPlaying.currentTime) }}</p>
+                    <p>{{ formatTime(nowPlaying.maxTime) }}</p>
+                  </div>
+                  <div class="h-4 bg-gray-200 rounded-lg">
+                    <div
+                      class="h-4 bg-gray-600 rounded-lg"
+                      :style="{
+                        width:
+                          calculatePercentage(
+                            nowPlaying.currentTime,
+                            nowPlaying.maxTime
+                          ) + '%',
+                      }"
+                    ></div>
+                  </div>
+                </div>
+                <div class="grow text-[20px] text-right pr-3">
+                  <h5 class="font-dark text-[30px]">
+                    {{ trimString(nowPlaying.title) }}
+                  </h5>
+                  <p>{{ trimString(nowPlaying.artist) }}</p>
+                  <p>{{ trimString(nowPlaying.album) }}</p>
+                </div>
+                <img
+                  id="art"
+                  :src="albumArt"
+                  class="rounded-lg w-[90px] h-[90px]"
+                />
+              </div>
+            </card>
+          </div>
+        </div>
 
         <div class="flex items-baseline">
           <h1 class="levelFont text-[600pt]">
