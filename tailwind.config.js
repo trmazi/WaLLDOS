@@ -5,9 +5,8 @@ export default {
     extend: {
       fontFamily: {
         arial: ["Arial"],
-     }
+      },
     },
   },
   plugins: [],
-}
-
+};
