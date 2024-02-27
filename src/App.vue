@@ -236,19 +236,23 @@ var nowPlaying = {
 var albumArt;
 
 async function testAirPlay() {
+  const uri = window.location.search.substring(1);
+  const params = new URLSearchParams(uri);
+  const identifier = params.get("identifier");
+
   const response = await axios.get(`${AirPlayAPI.server}`);
   const data = await response.data;
-  if (data["status"] == "ok") {
-    await getNowPlaying();
+  if (data["status"] == "ok" && identifier != null) {
+    await getNowPlaying(identifier);
     return true;
   }
   return false;
 }
 
-async function getNowPlaying() {
+async function getNowPlaying(identifier) {
   const oldTitle = nowPlaying["title"];
   const response = await axios.get(
-    `${AirPlayAPI.apiServer}nowPlaying?identifier=BE0B6C80-EF57-4D78-9D90-27C30AC73DDE`
+    `${AirPlayAPI.apiServer}nowPlaying?identifier=${identifier}`
   );
   const data = await response.data;
   if (data["status"] == "ok") {
