@@ -56,6 +56,20 @@ function getBirthday() {
   return false;
 }
 
+function getWeedDay() {
+  const today = new Date();
+  const holidayDate = new Date(0);
+  holidayDate.setUTCSeconds(parseInt(1713592580));
+
+  if (
+    holidayDate.getMonth() == today.getMonth() &&
+    holidayDate.getDate() == today.getDate()
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function getWeek() {
   var currentDate = new Date();
   var result = [new Date(currentDate)];
@@ -433,6 +447,10 @@ function trimString(string) {
           <div v-if="getBirthday()" class="grid justify-items-center">
             <img class="w-50" :src="`/warn/cake.png`" />
             <h4 class="text-2xl levelFont">Happy Birthday!</h4>
+          </div>
+          <div v-if="getWeedDay()" class="grid justify-items-center">
+            <img class="w-50" :src="`/warn/weed.png`" />
+            <h4 class="text-2xl levelFont">Happy Holidays!</h4>
           </div>
         </div>
         <div class="grid grid-flow-row gap-2">
