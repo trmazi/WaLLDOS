@@ -449,7 +449,7 @@ function trimString(string) {
             <h4 class="text-2xl levelFont">Happy Birthday!</h4>
           </div>
           <div v-if="getWeedDay()" class="grid justify-items-center">
-            <img class="w-50" :src="`/warn/weed.png`" />
+            <img class="w-[110px]" :src="`/warn/weed.png`" />
             <h4 class="text-2xl levelFont">Happy Holidays!</h4>
           </div>
         </div>
