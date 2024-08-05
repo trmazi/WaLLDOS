@@ -14,6 +14,10 @@ window.setInterval(() => {
   data.date = new Date();
 }, 1000);
 
+window.setInterval(() => {
+  resetMarquee();
+}, 4000);
+
 function getOrdinal(d) {
   if (d > 3 && d < 21) return "th";
   switch (d % 10) {
@@ -118,11 +122,6 @@ window.setInterval(() => {
 
 onMounted(() => {
   getWeather();
-
-  resetMarquee();
-  setInterval(() => {
-    resetMarquee();
-  }, 2000);
 });
 
 function weatherFromDate(date) {
@@ -259,7 +258,7 @@ async function getNowPlaying() {
     nowPlaying = data;
 
     if (nowPlaying["title"] != oldTitle) {
-      albumArt.value = `http://volumio.local${nowPlaying["albumart"]}`;
+      albumArt.value = `https://volumio.local${nowPlaying["albumart"]}`;
       // Reset shouldTrim to false for the new song
       shouldTrim.value = {
         title: false,

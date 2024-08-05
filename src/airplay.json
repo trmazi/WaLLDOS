@@ -1,4 +1,4 @@
 {
-    "server": "http://volumio.local/",
-    "apiServer": "http://volumio.local/api/v1"
+    "server": "https://volumio.local/",
+    "apiServer": "https://volumio.local/api/v1"
 }
