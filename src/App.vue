@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import * as Mdi from "@mdi/js";
 import axios from "axios";
 import WeatherAPI from "./weather.json";
@@ -118,6 +118,11 @@ window.setInterval(() => {
 
 onMounted(() => {
   getWeather();
+
+  resetMarquee();
+  setInterval(() => {
+    resetMarquee();
+  }, 2000);
 });
 
 function weatherFromDate(date) {
@@ -235,65 +240,36 @@ function getConditions(date) {
   return conditionList[day.weather.find((x) => x.id).id];
 }
 
-var nowPlaying = {
-  state: "idle",
-  title: null,
-  artist: null,
-  album: null,
-  currentTime: null,
-  maxTime: null,
-  repeat: null,
-  shuffle: null,
-  albumArt: null,
-};
+var nowPlaying = null;
 
-var albumArt;
+const shouldTrim = ref({
+  title: false,
+  artist: false,
+  album: false,
+});
 
-async function testAirPlay() {
-  const uri = window.location.search.substring(1);
-  const params = new URLSearchParams(uri);
-  const identifier = params.get("identifier");
+const albumArt = ref("");
 
-  const response = await axios.get(`${AirPlayAPI.server}`);
+async function getNowPlaying() {
+  const oldTitle = nowPlaying?.title;
+  const response = await axios.get(`${AirPlayAPI.apiServer}/getState`);
   const data = await response.data;
-  if (data["status"] == "ok" && identifier != null) {
-    await getNowPlaying(identifier);
-    return true;
-  }
-  return false;
-}
 
-async function getNowPlaying(identifier) {
-  const oldTitle = nowPlaying["title"];
-  const response = await axios.get(
-    `${AirPlayAPI.apiServer}nowPlaying?identifier=${identifier}`
-  );
-  const data = await response.data;
-  if (data["status"] == "ok") {
-    nowPlaying = data["data"];
-
-    if (nowPlaying["shuffle"] == "off") {
-      nowPlaying["shuffle"] = false;
-    }
-
-    if (nowPlaying["repeat"] == "off") {
-      nowPlaying["repeat"] = false;
-    }
+  if (data != undefined) {
+    nowPlaying = data;
 
     if (nowPlaying["title"] != oldTitle) {
-      getArt();
+      albumArt.value = `http://volumio.local${nowPlaying["albumart"]}`;
+      // Reset shouldTrim to false for the new song
+      shouldTrim.value = {
+        title: false,
+        artist: false,
+        album: false,
+      };
     }
     return true;
   }
   return false;
-}
-
-function getArt() {
-  albumArt = `${
-    AirPlayAPI.apiServer
-  }coverArt?identifier=BE0B6C80-EF57-4D78-9D90-27C30AC73DDE&rand=${Math.random()}`;
-  var ArtElement = document.getElementById("art");
-  ArtElement.src = albumArt;
 }
 
 function formatTime(totalSeconds) {
@@ -315,6 +291,31 @@ function trimString(string) {
     string.length > length ? string.substring(0, length - 3) + "..." : string;
   return trimmedString;
 }
+
+function shouldMarquee(text) {
+  return text && text.length > 18;
+}
+
+function handleAnimationEnd(field) {
+  shouldTrim.value[field] = true;
+}
+
+const marqueeClass = ref("marquee-run");
+
+function resetMarquee() {
+  if (nowPlaying) {
+    if (
+      shouldMarquee(nowPlaying.title) ||
+      shouldMarquee(nowPlaying.artist) ||
+      shouldMarquee(nowPlaying.album)
+    ) {
+      marqueeClass.value = "marquee-reset";
+      setTimeout(() => {
+        marqueeClass.value = "marquee-run";
+      }, 0);
+    }
+  }
+}
 </script>
 
 <template>
@@ -334,86 +335,104 @@ function trimString(string) {
               {{ data.date.toLocaleString("en-us", { month: "long" }) }}
             </h4>
           </div>
-          <div
-            v-if="testAirPlay() && nowPlaying.state != 'idle'"
-            class="levelFont w-[450px]"
-          >
-            <div>
-              <h2 class="levelFont text-[40px] pb-2">What's Playing?</h2>
-              <h2 class="text-gray-500 text-[20px]">Living Room</h2>
-            </div>
-            <card class="pt-5 my-3 rounded-lg max-h-40 bg-red-50">
-              <div class="flex justify-start">
-                <div class="grow text-[30px] pr-3">
-                  <div class="w-full -ml-2 flex items-center">
-                    <BaseIcon
-                      v-if="nowPlaying.state == 'playing'"
-                      :path="Mdi.mdiPlay"
-                      size="40"
-                    />
-                    <BaseIcon
-                      v-if="nowPlaying.state == 'paused'"
-                      :path="Mdi.mdiPause"
-                      size="40"
-                    />
-                    <BaseIcon
-                      v-if="nowPlaying.state == 'seeking'"
-                      :path="Mdi.mdiFastForward"
-                      size="40"
-                    />
-                    <BaseIcon
-                      v-if="nowPlaying.state == 'loading'"
-                      :path="Mdi.mdiLoading"
-                      size="40"
-                    />
-                    <BaseIcon
-                      v-if="nowPlaying.state == 'stopped'"
-                      :path="Mdi.mdiStop"
-                      size="40"
-                    />
-                    <BaseIcon
-                      v-if="nowPlaying.repeat"
-                      :path="Mdi.mdiRepeat"
-                      size="20"
-                    />
-                    <BaseIcon
-                      v-if="nowPlaying.shuffle"
-                      :path="Mdi.mdiShuffle"
-                      size="20"
-                    />
-                  </div>
-                  <div class="flex justify-between text-xl">
-                    <p>{{ formatTime(nowPlaying.currentTime) }}</p>
-                    <p>{{ formatTime(nowPlaying.maxTime) }}</p>
-                  </div>
-                  <div class="h-4 bg-gray-200 rounded-lg">
-                    <div
-                      class="h-4 bg-gray-600 rounded-lg"
-                      :style="{
-                        width:
-                          calculatePercentage(
-                            nowPlaying.currentTime,
-                            nowPlaying.maxTime
-                          ) + '%',
-                      }"
-                    ></div>
+          <template v-if="getNowPlaying() && nowPlaying?.title">
+            <div class="levelFont w-[550px] grid grid-cols-2">
+              <div>
+                <h2 class="text-gray-500 text-[20px]">Kitchen Speakers</h2>
+                <h2 class="text-[40px] pb-2">What's Playing?</h2>
+                <div class="flex justify-start">
+                  <div class="w-[70%] flex space-x-2 items-start">
+                    <div class="-ml-2 flex items-center">
+                      <BaseIcon
+                        v-if="nowPlaying.status == 'play'"
+                        :path="Mdi.mdiPlay"
+                        size="40"
+                      />
+                      <BaseIcon
+                        v-if="nowPlaying.status == 'pause'"
+                        :path="Mdi.mdiPause"
+                        size="40"
+                      />
+                    </div>
+                    <div class="grow text-[30px] pr-3">
+                      <div class="flex justify-between text-xl">
+                        <p>{{ formatTime(nowPlaying.seek / 1000) }}</p>
+                        <p>{{ formatTime(nowPlaying.duration) }}</p>
+                      </div>
+                      <div class="h-4 bg-gray-200 rounded-lg">
+                        <div
+                          class="h-4 bg-gray-600 rounded-lg"
+                          :style="{
+                            width:
+                              calculatePercentage(
+                                nowPlaying.seek / 1000,
+                                nowPlaying.duration
+                              ) + '%',
+                          }"
+                        ></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div class="grow text-[20px] text-right pr-3">
-                  <h5 class="font-dark text-[30px]">
-                    {{ trimString(nowPlaying.title) }}
-                  </h5>
-                  <p>{{ trimString(nowPlaying.artist) }}</p>
-                  <p>{{ trimString(nowPlaying.album) }}</p>
-                </div>
-                <img
-                  id="art"
-                  :src="albumArt"
-                  class="rounded-lg w-[90px] h-[90px]"
-                />
               </div>
-            </card>
-          </div>
+              <div class="flex items-center">
+                <div class="text-[20px] text-right pr-3 max-w-full">
+                  <div
+                    v-if="shouldMarquee(nowPlaying.title) && !shouldTrim.title"
+                    class="marquee-container"
+                  >
+                    <h5
+                      :class="marqueeClass"
+                      class="font-dark text-[30px] marquee-content"
+                      @animationend="handleAnimationEnd('title')"
+                    >
+                      {{ nowPlaying.title }}
+                    </h5>
+                  </div>
+                  <div v-else>
+                    <h5 class="font-dark text-[30px]">
+                      {{ trimString(nowPlaying.title) }}
+                    </h5>
+                  </div>
+
+                  <div
+                    v-if="
+                      shouldMarquee(nowPlaying.artist) && !shouldTrim.artist
+                    "
+                    class="marquee-container"
+                  >
+                    <p
+                      :class="marqueeClass"
+                      class="marquee-content"
+                      @animationend="handleAnimationEnd('artist')"
+                    >
+                      {{ nowPlaying.artist }}
+                    </p>
+                  </div>
+                  <div v-else>
+                    <p>{{ trimString(nowPlaying.artist) }}</p>
+                  </div>
+
+                  <div
+                    v-if="shouldMarquee(nowPlaying.album) && !shouldTrim.album"
+                    class="marquee-container"
+                  >
+                    <p
+                      :class="marqueeClass"
+                      class="marquee-content"
+                      @animationend="handleAnimationEnd('album')"
+                    >
+                      {{ nowPlaying.album }}
+                    </p>
+                  </div>
+                  <div v-else>
+                    <p>{{ trimString(nowPlaying.album) }}</p>
+                  </div>
+                </div>
+                <img :src="albumArt" class="rounded-lg w-[90px] h-[90px]" />
+              </div>
+            </div>
+          </template>
         </div>
 
         <div class="flex items-baseline">

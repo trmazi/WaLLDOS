@@ -19,3 +19,34 @@
 body {
   font-family: HelveticaPro;
 }
+
+.marquee-container {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  width: calc(20.5ch);
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 10s linear forwards;
+  padding-left: 100%;
+  text-overflow: hidden;
+}
+
+.marquee-reset {
+  animation: none;
+}
+.marquee-run {
+  animation: marquee 10s linear forwards;
+  padding-left: 100%;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

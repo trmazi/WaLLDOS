@@ -1,5 +1,4 @@
 {
-    "server": "https://airplay.pha.icu/",
-    "apiServer": "https://airplay.pha.icu/api/v1/",
-    "identifier": "0C42974A-BD1C-47FC-BDBE-AEF933A02C14"
+    "server": "http://volumio.local/",
+    "apiServer": "http://volumio.local/api/v1"
 }
