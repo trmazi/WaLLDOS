@@ -247,7 +247,7 @@ const albumArt = ref("");
 
 async function getNowPlaying() {
   const oldTitle = nowPlaying?.title;
-  const response = await axios.get(`${VolumioAPI.server}api/v1/getState`);
+  const response = await axios.get(`${VolumioAPI.server}/api/v1/getState`);
   const data = await response.data;
 
   if (data != undefined) {
