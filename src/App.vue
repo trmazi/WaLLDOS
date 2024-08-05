@@ -3,7 +3,7 @@ import { reactive, ref, onMounted } from "vue";
 import * as Mdi from "@mdi/js";
 import axios from "axios";
 import WeatherAPI from "./weather.json";
-import AirPlayAPI from "./airplay.json";
+import VolumioAPI from "./volumio.json";
 import BaseIcon from "./components/BaseIcon.vue";
 
 const data = reactive({
@@ -13,10 +13,6 @@ const data = reactive({
 window.setInterval(() => {
   data.date = new Date();
 }, 1000);
-
-window.setInterval(() => {
-  resetMarquee();
-}, 4000);
 
 function getOrdinal(d) {
   if (d > 3 && d < 21) return "th";
@@ -251,14 +247,14 @@ const albumArt = ref("");
 
 async function getNowPlaying() {
   const oldTitle = nowPlaying?.title;
-  const response = await axios.get(`${AirPlayAPI.apiServer}/getState`);
+  const response = await axios.get(`${VolumioAPI.server}api/v1/getState`);
   const data = await response.data;
 
   if (data != undefined) {
     nowPlaying = data;
 
     if (nowPlaying["title"] != oldTitle) {
-      albumArt.value = `https://volumio.local${nowPlaying["albumart"]}`;
+      albumArt.value = `${VolumioAPI.server}${nowPlaying["albumart"]}`;
       // Reset shouldTrim to false for the new song
       shouldTrim.value = {
         title: false,
@@ -298,23 +294,6 @@ function shouldMarquee(text) {
 function handleAnimationEnd(field) {
   shouldTrim.value[field] = true;
 }
-
-const marqueeClass = ref("marquee-run");
-
-function resetMarquee() {
-  if (nowPlaying) {
-    if (
-      shouldMarquee(nowPlaying.title) ||
-      shouldMarquee(nowPlaying.artist) ||
-      shouldMarquee(nowPlaying.album)
-    ) {
-      marqueeClass.value = "marquee-reset";
-      setTimeout(() => {
-        marqueeClass.value = "marquee-run";
-      }, 0);
-    }
-  }
-}
 </script>
 
 <template>
@@ -335,9 +314,9 @@ function resetMarquee() {
             </h4>
           </div>
           <template v-if="getNowPlaying() && nowPlaying?.title">
-            <div class="levelFont w-[550px] grid grid-cols-2">
+            <div class="levelFont w-[500px] grid grid-cols-2">
               <div>
-                <h2 class="text-gray-500 text-[20px]">Kitchen Speakers</h2>
+                <h2 class="text-gray-500 text-[20px]">{{ VolumioAPI.name }}</h2>
                 <h2 class="text-[40px] pb-2">What's Playing?</h2>
                 <div class="flex justify-start">
                   <div class="w-[70%] flex space-x-2 items-start">
@@ -374,8 +353,8 @@ function resetMarquee() {
                   </div>
                 </div>
               </div>
-              <div class="flex items-center">
-                <div class="text-[20px] text-right pr-3 max-w-full">
+              <div class="flex items-center w-full">
+                <div class="text-[20px] text-right pr-3 w-full">
                   <div
                     v-if="shouldMarquee(nowPlaying.title) && !shouldTrim.title"
                     class="marquee-container"
