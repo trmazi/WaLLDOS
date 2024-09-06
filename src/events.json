@@ -1,16 +1,23 @@
 [
     {
-        "id": "birthday",
-        "text": "Happy Birthday!",
-        "image": "/warn/cake.png",
-        "size": "w-50",
-        "timestamp": 1724717217
-    },
-    {
-        "id": "420",
+        "id": "weed",
         "text": "Happy Holidays!",
         "image": "/warn/weed.png",
-        "size": "w-[110px]",
+        "size": 100,
         "timestamp": 1713592580
+    },
+    {
+        "id": "christmas",
+        "text": "Happy Holidays!",
+        "image": "/warn/christmas.png",
+        "size": 150,
+        "timestamp": 1735106816
+    },
+    {
+        "id": "halloween",
+        "text": "Boo!",
+        "image": "/warn/ghost.png",
+        "size": 120,
+        "timestamp": 1730351216
     }
 ]

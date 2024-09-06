@@ -24,7 +24,7 @@ function testEvent(timestamp) {
 <template>
   <template v-for="event of Events" :key="event.id">
     <div v-if="testEvent(event.timestamp)" class="grid justify-items-center">
-      <img :class="event.size" :src="event.image" />
+      <img :width="event.size" :src="event.image" />
       <h4 class="text-2xl levelFont">{{ event.text }}</h4>
     </div>
   </template>
