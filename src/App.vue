@@ -38,13 +38,13 @@ window.setInterval(() => {
           <FullDate :date="data.date" />
           <EventIcon :date="data.date" />
         </div>
-        <hr class="border-2 border-black" />
+        <hr class="border-2 border-black my-2" />
         <SecondBar :date="data.date" />
       </div>
 
       <div>
-        <hr class="border-2 border-black mb-5" />
-        <WeatherGrid :date="data.date" />
+        <hr class="border-2 border-black mb-5 w-full" />
+        <WeatherGrid class="w-full" :date="data.date" />
 
         <ApertureLogo />
       </div>

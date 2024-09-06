@@ -112,7 +112,7 @@ function getConditions(date) {
       v-for="day of getWeek()"
       :key="day"
       :class="dateClass(day.getDate())"
-      class="border-2 w-36 h-40 flex justify-center place-items-center"
+      class="border-2 h-44 flex justify-center place-items-center"
     >
       <div v-if="currentWeather" class="grid justify-items-center levelFont">
         <h1 class="text-3xl mt-2">

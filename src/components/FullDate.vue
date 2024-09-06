@@ -8,8 +8,8 @@ defineProps({
 </script>
 
 <template>
-  <div>
-    <h2 class="ml-5 text-5xl">
+  <div class="ml-5 grid grid-cols-1 align-baseline text-5xl">
+    <h2>
       {{
         date.toLocaleDateString("en-us", {
           month: "numeric",
@@ -18,7 +18,7 @@ defineProps({
         })
       }}
     </h2>
-    <h2 class="ml-5 text-5xl">
+    <h2>
       {{
         date.toLocaleString("en-US", {
           hour: "numeric",

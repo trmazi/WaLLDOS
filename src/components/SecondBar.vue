@@ -14,7 +14,7 @@ defineProps({
         v-for="id in Array.from({ length: 60 }, (x, i) => i)"
         :key="id"
         :class="id <= date.getSeconds() ? 'border-black' : 'invisible'"
-        class="border-r-2 w-2 h-12"
+        class="border-l-4 w-2 h-12"
       />
     </div>
   </div>

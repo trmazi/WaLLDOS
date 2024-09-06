@@ -8,7 +8,7 @@ defineProps({
 </script>
 
 <template>
-  <div>
+  <div class="text-[70px]">
     <h4 class="levelFont">
       {{ date.toLocaleString("en-us", { weekday: "long" }) }},
     </h4>
