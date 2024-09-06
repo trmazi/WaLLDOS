@@ -31,7 +31,7 @@ function doubleDate(date) {
 
 <template>
   <div class="flex items-baseline">
-    <h1 class="levelFont text-[600pt]">
+    <h1 class="levelFont text-[600pt] scale-y-110 scale-90">
       {{ doubleDate(date.getDate()) }}
     </h1>
     <h2 class="">{{ getOrdinal(date.getDate()) }}</h2>
