@@ -1,6 +1,8 @@
 <script setup>
 import { reactive } from "vue";
 
+import MainLayout from "@/layouts/MainLayout.vue";
+
 import DateHeader from "@/components/DateHeader.vue";
 import NowPlaying from "@/components/NowPlaying.vue";
 import BigDate from "@/components/BigDate.vue";
@@ -20,12 +22,8 @@ window.setInterval(() => {
 </script>
 
 <template>
-  <div
-    class="p-12 w-screen h-screen shadow-[inset_0_-2px_50px_rgba(0,0,0,0.9)] bg-red-100"
-  >
-    <div
-      class="pl-[200px] pr-[23px] w-full h-full grid content-between justify-center"
-    >
+  <MainLayout>
+    <div class="pr-[23px] w-full h-full grid content-between justify-center">
       <div class="text-7xl">
         <div class="flex justify-between -mb-[40px]">
           <DateHeader :date="data.date" />
@@ -49,5 +47,5 @@ window.setInterval(() => {
         <ApertureLogo />
       </div>
     </div>
-  </div>
+  </MainLayout>
 </template>
