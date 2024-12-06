@@ -1,5 +1,16 @@
 import { createApp } from "vue";
 import "./style.css";
+import router from "./router";
 import App from "./App.vue";
 
-createApp(App).mount("#app");
+const app = createApp(App);
+app.use(router);
+app.mount("#app");
+
+const defaultDocumentTitle = "WallDOS";
+
+router.afterEach((to) => {
+  document.title = to.meta?.title
+    ? `${to.meta.title} — ${defaultDocumentTitle}`
+    : defaultDocumentTitle;
+});
