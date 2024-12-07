@@ -10,7 +10,6 @@ import FullDate from "@/components/FullDate.vue";
 import EventIcon from "@/components/EventIcon.vue";
 import SecondBar from "@/components/SecondBar.vue";
 import WeatherGrid from "@/components/WeatherGrid.vue";
-import ApertureLogo from "@/components/ApertureLogo.vue";
 
 const data = reactive({
   date: new Date(),
@@ -23,29 +22,25 @@ window.setInterval(() => {
 
 <template>
   <MainLayout>
-    <div class="pr-[23px] w-full h-full grid content-between justify-center">
-      <div class="text-7xl">
-        <div class="flex justify-between -mb-[40px]">
-          <DateHeader :date="data.date" />
-          <NowPlaying :date="data.date" />
-        </div>
-
-        <BigDate :date="data.date" />
-
-        <div class="flex place-items-center place-content-between w-full">
-          <FullDate :date="data.date" />
-          <EventIcon :date="data.date" />
-        </div>
-        <hr class="border-2 border-black my-2" />
-        <SecondBar :date="data.date" />
+    <div class="text-7xl">
+      <div class="flex justify-between -mb-[40px]">
+        <DateHeader :date="data.date" />
+        <NowPlaying :date="data.date" />
       </div>
 
-      <div>
-        <hr class="border-2 border-black mb-5 w-full" />
-        <WeatherGrid class="w-full" :date="data.date" />
+      <BigDate :date="data.date" />
 
-        <ApertureLogo />
+      <div class="flex place-items-center place-content-between w-full">
+        <FullDate :date="data.date" />
+        <EventIcon :date="data.date" />
       </div>
+      <hr class="border-2 border-black my-2" />
+      <SecondBar :date="data.date" />
+    </div>
+
+    <div>
+      <hr class="border-2 border-black mb-5 w-full" />
+      <WeatherGrid class="w-full" :date="data.date" />
     </div>
   </MainLayout>
 </template>
