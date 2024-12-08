@@ -1,5 +1,7 @@
 <script setup>
 import { reactive } from "vue";
+import { useRouter } from "vue-router";
+import Cookies from "js-cookie";
 
 import MainLayout from "@/layouts/MainLayout.vue";
 
@@ -10,6 +12,13 @@ import FullDate from "@/components/FullDate.vue";
 import EventIcon from "@/components/EventIcon.vue";
 import SecondBar from "@/components/SecondBar.vue";
 import WeatherGrid from "@/components/WeatherGrid.vue";
+
+const router = useRouter();
+if (!Cookies.get("setupComplete")) {
+  router.push({
+    name: "setup",
+  });
+}
 
 const data = reactive({
   date: new Date(),
