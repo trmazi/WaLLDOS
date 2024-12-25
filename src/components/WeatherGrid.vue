@@ -11,6 +11,14 @@ const props = defineProps({
     type: Date,
     required: true,
   },
+  apiKey: {
+    type: String,
+    required: true,
+  },
+  locationKey: {
+    type: String,
+    required: true,
+  },
 });
 
 function getWeek() {
@@ -35,7 +43,7 @@ var currentWeather = null;
 
 async function getCoords() {
   const response = await axios.get(
-    `${WeatherAPI.locationServer}check?api_key=${WeatherAPI.locationKey}&format=json`
+    `${WeatherAPI.locationServer}check?api_key=${props.locationKey}&format=json`
   );
   const currentLocation = await response.data;
   var data = {};
@@ -47,7 +55,7 @@ async function getCoords() {
 async function getWeather() {
   const locData = await getCoords();
   const response = await axios.get(
-    `${WeatherAPI.server}onecall?lat=${locData.lat}&lon=${locData.lon}&appid=${WeatherAPI.apiKey}&exclude=current,minutely,hourly&units=imperial`
+    `${WeatherAPI.server}onecall?lat=${locData.lat}&lon=${locData.lon}&appid=${props.apiKey}&exclude=current,minutely,hourly&units=imperial`
   );
   currentWeather = await response.data;
 }

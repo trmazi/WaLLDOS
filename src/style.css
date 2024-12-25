@@ -20,6 +20,10 @@ body {
   font-family: HelveticaPro;
 }
 
+input[type=checkbox] {
+  transform: scale(2.5);
+}
+
 .marquee-container {
   position: relative;
   overflow: hidden;

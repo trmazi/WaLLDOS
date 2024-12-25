@@ -1,12 +1,22 @@
 <script setup>
 import axios from "axios";
 import * as Mdi from "@mdi/js";
-import VolumioAPI from "../volumio.json";
 import { ref } from "vue";
 
 import BaseIcon from "./BaseIcon.vue";
 
 var nowPlaying = null;
+
+const props = defineProps({
+  volumioName: {
+    type: String,
+    required: true,
+  },
+  volumioServer: {
+    type: String,
+    required: true,
+  },
+});
 
 const shouldTrim = ref({
   title: false,
@@ -18,14 +28,14 @@ const albumArt = ref("");
 
 async function getNowPlaying() {
   const oldTitle = nowPlaying?.title;
-  const response = await axios.get(`${VolumioAPI.server}/api/v1/getState`);
+  const response = await axios.get(`${props.volumioServer}/api/v1/getState`);
   const data = await response.data;
 
   if (data != undefined) {
     nowPlaying = data;
 
     if (nowPlaying["title"] != oldTitle) {
-      albumArt.value = `${VolumioAPI.server}${nowPlaying["albumart"]}`;
+      albumArt.value = `${props.volumioServer}${nowPlaying["albumart"]}`;
       // Reset shouldTrim to false for the new song
       shouldTrim.value = {
         title: false,
@@ -73,7 +83,7 @@ function handleAnimationEnd(field) {
     class="levelFont w-[500px] grid grid-cols-2"
   >
     <div>
-      <h2 class="text-gray-500 text-[20px]">{{ VolumioAPI.name }}</h2>
+      <h2 class="text-gray-500 text-[20px]">{{ props.volumioName }}</h2>
       <h2 class="text-[40px] pb-2">What's Playing?</h2>
       <div class="flex justify-start">
         <div class="w-[70%] flex space-x-2 items-start">

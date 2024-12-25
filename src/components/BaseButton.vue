@@ -17,6 +17,10 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
+  iconInset: {
+    type: [String, Number],
+    default: null,
+  },
   href: {
     type: String,
     default: null,
@@ -128,7 +132,7 @@ const componentClass = computed(() => {
     :target="target"
     :disabled="disabled"
   >
-    <BaseIcon v-if="icon" :path="icon" :size="iconSize" />
+    <BaseIcon v-if="icon" :path="icon" :size="iconSize" :inset="iconInset" />
     <span v-if="label" :class="labelClass">{{ label }}</span>
   </component>
 </template>

@@ -10,6 +10,10 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
+  inset: {
+    type: [String, Number],
+    default: null,
+  },
 });
 
 const spanClass = computed(
@@ -26,6 +30,7 @@ const iconSize = computed(() => props.size ?? 16);
       :width="iconSize"
       :height="iconSize"
       class="inline-block"
+      :class="inset == null ? 'p-0' : `p-${inset}`"
     >
       <path fill="currentColor" :d="path" />
     </svg>
