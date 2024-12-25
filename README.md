@@ -10,7 +10,11 @@
 
 ## Usage
 
-Use either the hosted GitHub Pages (no volumio!) or build and self-host with nginx. 
+Use either the hosted GitHub Pages (no volumio!) or build and self-host with nginx.
+
+#### GitHub Pages
+You can use WaLLDOS via the publicly hosted URL https://walldos.iidxfan.xyz, though Volumio will **not** work unless it's HTTPS!
+Repository: https://github.com/trmazi/WaLLDOS_pages
 
 #### Install
 
